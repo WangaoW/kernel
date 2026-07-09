@@ -17,7 +17,6 @@
 #include <dt-bindings/interconnect/qcom,x1e80100-rpmh.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/mailbox/qcom-ipcc.h>
-#include <dt-bindings/media/qcom,sm8550-iris.h>
 #include <dt-bindings/phy/phy.h>
 #include <dt-bindings/phy/phy-qcom-mipi-csi2.h>
 #include <dt-bindings/phy/phy-qcom-qmp.h>
@@ -736,6 +735,10 @@
 			reg = <0x0 0xffe00000 0x0 0x200000>;
 			hwlocks = <&tcsr_mutex 3>;
 			no-map;
+		};
+
+		iris_resv: reservation-iris {
+			iommu-addresses = <&iris_non_pixel 0x0 0x0 0x0 0x25800000>;
 		};
 	};
 
@@ -5508,9 +5511,10 @@
 			resets = <&gcc GCC_VIDEO_AXI0_CLK_ARES>;
 			reset-names = "bus";
 
-			iommu-map = <IRIS_NON_PIXEL_VCODEC &apps_smmu 0x1940 0x0 0x1>,
-				 <IRIS_PIXEL &apps_smmu 0x1947 0x0 0x1>;
 			dma-coherent;
+
+			#address-cells = <2>;
+			#size-cells = <2>;
 
 			/*
 			 * IRIS firmware is signed by vendors, only
@@ -5518,6 +5522,15 @@
 			 * is available.
 			 */
 			status = "disabled";
+
+			iris_non_pixel: non-pixel {
+				iommus = <&apps_smmu 0x1940 0x0>;
+				memory-region = <&iris_resv>;
+			};
+
+			iris_pixel: pixel {
+				iommus = <&apps_smmu 0x1947 0x0>;
+			};
 
 			iris_opp_table: opp-table {
 				compatible = "operating-points-v2";
