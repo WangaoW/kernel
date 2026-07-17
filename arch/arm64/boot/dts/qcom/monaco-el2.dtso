@@ -14,7 +14,7 @@
 
 &iris {
 	status = "okay";
-	video-firmware {
+	firmware {
 		iommus = <&apps_smmu 0x0882 0x0400>;
 	};
 };
